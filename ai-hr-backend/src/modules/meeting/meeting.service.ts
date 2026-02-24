@@ -32,10 +32,18 @@ export class MeetingService {
     if (!participantIds.includes(organizerId)) participantIds.push(organizerId);
     return this.prisma.meeting.create({
       data: {
-        orgId, title: dto.title, description: dto.description, organizerId,
-        roomId: dto.roomId, startTime: new Date(dto.startTime), endTime: new Date(dto.endTime),
-        meetingLink: dto.meetingLink, agenda: dto.agenda,
-        isRecurring: dto.isRecurring ?? false, recurrenceRule: dto.recurrenceRule,
+        orgId,
+        title: dto.title,
+        description: dto.description,
+        organizerId,
+        roomId: dto.roomId,
+        startTime: new Date(dto.startTime),
+        endTime: new Date(dto.endTime),
+        meetingLink: dto.meetingLink,
+        agenda: dto.agenda,
+        isRecurring: dto.isRecurring ?? false,
+        // JSON field – cast to any for Prisma
+        recurrenceRule: dto.recurrenceRule as any,
         participants: { create: participantIds.map(empId => ({ employeeId: empId, isOrganizer: empId === organizerId })) },
       },
       include: { participants: { include: { employee: { select: { id:true,firstName:true,lastName:true } } } } },
@@ -45,7 +53,14 @@ export class MeetingService {
   async updateMeeting(orgId: string, id: string, dto: Partial<CreateMeetingDto>) {
     const m = await this.prisma.meeting.findFirst({ where: { id, orgId } });
     if (!m) throw new NotFoundException('Meeting not found');
-    return this.prisma.meeting.update({ where: { id }, data: { ...dto, startTime: dto.startTime ? new Date(dto.startTime) : undefined, endTime: dto.endTime ? new Date(dto.endTime) : undefined } });
+    return this.prisma.meeting.update({
+      where: { id },
+      data: {
+        ...(dto as any),
+        startTime: dto.startTime ? new Date(dto.startTime) : undefined,
+        endTime: dto.endTime ? new Date(dto.endTime) : undefined,
+      },
+    });
   }
 
   async cancelMeeting(orgId: string, id: string) {
@@ -60,11 +75,13 @@ export class MeetingService {
   }
 
   async getRooms(orgId: string) { return this.prisma.meetingRoom.findMany({ where: { orgId, isActive: true }, orderBy: { name: 'asc' } }); }
-  async createRoom(orgId: string, data: { name: string; capacity?: number; locationId?: string; facilities?: Record<string, unknown> }) { return this.prisma.meetingRoom.create({ data: { orgId, ...data } }); }
+  async createRoom(orgId: string, data: { name: string; capacity?: number; locationId?: string; facilities?: Record<string, unknown> }) {
+    return this.prisma.meetingRoom.create({ data: { orgId, ...(data as any) } });
+  }
   async updateRoom(orgId: string, id: string, data: Partial<{ name: string; capacity: number; facilities: Record<string, unknown>; isActive: boolean }>) {
     const r = await this.prisma.meetingRoom.findFirst({ where: { id, orgId } });
     if (!r) throw new NotFoundException('Room not found');
-    return this.prisma.meetingRoom.update({ where: { id }, data });
+    return this.prisma.meetingRoom.update({ where: { id }, data: data as any });
   }
 
   async getAnalytics(orgId: string) {

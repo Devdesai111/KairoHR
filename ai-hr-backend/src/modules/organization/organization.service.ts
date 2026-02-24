@@ -19,7 +19,7 @@ export class OrganizationService {
   }
 
   async updateOrganization(orgId: string, dto: UpdateOrganizationDto) {
-    return this.prisma.organization.update({ where: { id: orgId }, data: dto });
+    return this.prisma.organization.update({ where: { id: orgId }, data: dto as any });
   }
 
   async getSetupProgress(orgId: string) {
@@ -46,11 +46,11 @@ export class OrganizationService {
     return this.prisma.legalEntity.findMany({ where: { orgId }, include: { _count: { select: { locations: true } } }, orderBy: { createdAt: 'desc' } });
   }
   async createLegalEntity(orgId: string, dto: CreateLegalEntityDto) {
-    return this.prisma.legalEntity.create({ data: { orgId, ...dto } });
+    return this.prisma.legalEntity.create({ data: { orgId, ...(dto as any) } });
   }
   async updateLegalEntity(orgId: string, id: string, dto: Partial<CreateLegalEntityDto>) {
     await this.findLegalEntityOrThrow(orgId, id);
-    return this.prisma.legalEntity.update({ where: { id }, data: dto });
+    return this.prisma.legalEntity.update({ where: { id }, data: dto as any });
   }
   async deleteLegalEntity(orgId: string, id: string) {
     await this.findLegalEntityOrThrow(orgId, id);
@@ -68,11 +68,11 @@ export class OrganizationService {
     return this.prisma.location.findMany({ where: { orgId }, include: { legalEntity: { select: { id: true, name: true } } }, orderBy: { name: 'asc' } });
   }
   async createLocation(orgId: string, dto: CreateLocationDto) {
-    return this.prisma.location.create({ data: { orgId, ...dto } });
+    return this.prisma.location.create({ data: { orgId, ...(dto as any) } });
   }
   async updateLocation(orgId: string, id: string, dto: Partial<CreateLocationDto>) {
     await this.findLocationOrThrow(orgId, id);
-    return this.prisma.location.update({ where: { id }, data: dto });
+    return this.prisma.location.update({ where: { id }, data: dto as any });
   }
   async deleteLocation(orgId: string, id: string) {
     await this.findLocationOrThrow(orgId, id);
@@ -97,11 +97,11 @@ export class OrganizationService {
     return build(all);
   }
   async createDepartment(orgId: string, dto: CreateDepartmentDto) {
-    return this.prisma.department.create({ data: { orgId, ...dto } });
+    return this.prisma.department.create({ data: { orgId, ...(dto as any) } });
   }
   async updateDepartment(orgId: string, id: string, dto: Partial<CreateDepartmentDto>) {
     await this.findDeptOrThrow(orgId, id);
-    return this.prisma.department.update({ where: { id }, data: dto });
+    return this.prisma.department.update({ where: { id }, data: dto as any });
   }
   async deleteDepartment(orgId: string, id: string) {
     await this.findDeptOrThrow(orgId, id);

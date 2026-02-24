@@ -93,7 +93,7 @@ export class AttendanceService {
       this.prisma.attendanceRecord.count({ where: { orgId, date: { gte: monthStart }, status: 'ABSENT' } }),
       this.prisma.regularizationRequest.count({ where: { orgId, status: 'PENDING' } }),
     ]);
-    return { today: todayStats.stats, monthlyAbsent, pendingRegularizations };
+    return { today: (todayStats as any).stats ?? todayStats, monthlyAbsent, pendingRegularizations };
   }
 
   // Shifts

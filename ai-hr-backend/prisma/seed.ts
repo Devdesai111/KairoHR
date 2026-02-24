@@ -1,7 +1,10 @@
+import 'dotenv/config';
 import { PrismaClient, RoleType } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 import * as argon2 from 'argon2';
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 const PERMISSIONS = [
   { module: 'organization', action: 'view' }, { module: 'organization', action: 'edit' },
@@ -140,12 +143,12 @@ async function main() {
 
   // Leave Types
   const leaveTypes = [
-    { code: 'CL', name: 'Casual Leave', maxDays: 12, isPaid: true, isProRata: true },
-    { code: 'SL', name: 'Sick Leave', maxDays: 12, isPaid: true, isProRata: false },
-    { code: 'EL', name: 'Earned Leave', maxDays: 21, isPaid: true, isProRata: true, isEncashable: true, carryForwardMax: 30 },
-    { code: 'ML', name: 'Maternity Leave', maxDays: 182, isPaid: true, genderRestriction: 'FEMALE' },
-    { code: 'PL', name: 'Paternity Leave', maxDays: 15, isPaid: true, genderRestriction: 'MALE' },
-    { code: 'LWP', name: 'Leave Without Pay', maxDays: 365, isPaid: false },
+    { code: 'CL', name: 'Casual Leave', maxDaysPerYear: 12, isPaid: true, isProRata: true },
+    { code: 'SL', name: 'Sick Leave', maxDaysPerYear: 12, isPaid: true, isProRata: false },
+    { code: 'EL', name: 'Earned Leave', maxDaysPerYear: 21, isPaid: true, isProRata: true, isEncashable: true, carryForwardMax: 30 },
+    { code: 'ML', name: 'Maternity Leave', maxDaysPerYear: 182, isPaid: true, genderRestriction: 'FEMALE' },
+    { code: 'PL', name: 'Paternity Leave', maxDaysPerYear: 15, isPaid: true, genderRestriction: 'MALE' },
+    { code: 'LWP', name: 'Leave Without Pay', maxDaysPerYear: 365, isPaid: false },
   ];
   for (const lt of leaveTypes) {
     await prisma.leaveType.upsert({

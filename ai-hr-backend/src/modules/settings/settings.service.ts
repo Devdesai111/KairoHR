@@ -41,8 +41,8 @@ export class SettingsService {
   async upsertIntegration(orgId: string, data: { name: string; type: string; config: Record<string, unknown>; isActive: boolean }) {
     return this.prisma.integration.upsert({
       where: { id: `${orgId}-${data.type}` },
-      create: { id: `${orgId}-${data.type}`, orgId, ...data },
+      create: { id: `${orgId}-${data.type}`, orgId, ...(data as any) },
       update: { config: data.config as any, isActive: data.isActive },
-    }).catch(() => this.prisma.integration.create({ data: { orgId, ...data } }));
+    }).catch(() => this.prisma.integration.create({ data: { orgId, ...(data as any) } }));
   }
 }

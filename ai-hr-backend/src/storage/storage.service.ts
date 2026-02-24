@@ -15,8 +15,8 @@ import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class StorageService implements OnModuleInit {
   private readonly logger = new Logger(StorageService.name);
-  private s3Client: S3Client;
-  private bucketName: string;
+  private s3Client!: S3Client;
+  private bucketName!: string;
 
   constructor(private readonly configService: ConfigService) {}
 

@@ -1,10 +1,10 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // ============================================================
@@ -517,30 +517,31 @@ model Employee {
   createdAt          DateTime       @default(now()) @map("created_at")
   updatedAt          DateTime       @updatedAt @map("updated_at")
 
-  organization      Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  user              User?               @relation(fields: [userId], references: [id])
-  department        Department?         @relation(fields: [departmentId], references: [id])
-  location          Location?           @relation("EmployeeLocation", fields: [locationId], references: [id])
-  reportingManager  Employee?           @relation("ManagerSubordinates", fields: [reportingManagerId], references: [id])
-  subordinates      Employee[]          @relation("ManagerSubordinates")
-  documents         EmployeeDocument[]
-  onboardingTasks   OnboardingTask[]
-  offboardingTasks  OffboardingTask[]
-  transfers         EmployeeTransfer[]
-  attendanceRecords AttendanceRecord[]
-  rosters           Roster[]
-  regularizations   RegularizationRequest[]
-  leaveBalances     LeaveBalance[]
-  leaveApplications LeaveApplication[]  @relation("EmployeeLeaves")
-  managedLeaves     LeaveApplication[]  @relation("ApproverLeaves")
-  salary            EmployeeSalary?
-  payslips          PaySlip[]
-  reimbursements    Reimbursement[]
-  loans             Loan[]
-  interviews        Interview[]
-  meetings          MeetingParticipant[]
-  grievances        Grievance[]         @relation("GrievanceRaisedBy")
-  assignedGrievances Grievance[]        @relation("GrievanceAssignedTo")
+  organization       Organization            @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user               User?                   @relation(fields: [userId], references: [id])
+  department         Department?             @relation(fields: [departmentId], references: [id])
+  location           Location?               @relation("EmployeeLocation", fields: [locationId], references: [id])
+  reportingManager   Employee?               @relation("ManagerSubordinates", fields: [reportingManagerId], references: [id])
+  subordinates       Employee[]              @relation("ManagerSubordinates")
+  documents          EmployeeDocument[]
+  onboardingTasks    OnboardingTask[]
+  offboardingTasks   OffboardingTask[]
+  transfers          EmployeeTransfer[]
+  attendanceRecords  AttendanceRecord[]
+  rosters            Roster[]
+  regularizations    RegularizationRequest[]
+  leaveBalances      LeaveBalance[]
+  leaveApplications  LeaveApplication[]      @relation("EmployeeLeaves")
+  managedLeaves      LeaveApplication[]      @relation("ApproverLeaves")
+  salary             EmployeeSalary?
+  payslips           PaySlip[]
+  reimbursements     Reimbursement[]
+  loans              Loan[]
+  interviews         Interview[]
+  meetings           MeetingParticipant[]
+  grievances         Grievance[]             @relation("GrievanceRaisedBy")
+  assignedGrievances Grievance[]             @relation("GrievanceAssignedTo")
+  leaveEncashments   LeaveEncashment[]
 
   @@unique([orgId, employeeId])
   @@unique([orgId, email])
@@ -1111,8 +1112,8 @@ model Application {
   rejectedReason String?          @map("rejected_reason")
   updatedAt      DateTime         @updatedAt @map("updated_at")
 
-  job       JobRequisition @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  candidate Candidate      @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  job        JobRequisition @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  candidate  Candidate      @relation(fields: [candidateId], references: [id], onDelete: Cascade)
   interviews Interview[]
   offers     Offer[]
 
@@ -1187,7 +1188,7 @@ model Meeting {
   createdAt      DateTime      @default(now()) @map("created_at")
   updatedAt      DateTime      @updatedAt @map("updated_at")
 
-  organization Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  organization Organization         @relation(fields: [orgId], references: [id], onDelete: Cascade)
   room         MeetingRoom?         @relation(fields: [roomId], references: [id])
   participants MeetingParticipant[]
 
@@ -1406,7 +1407,7 @@ model SystemSetting {
 
 model NotificationPreference {
   id        String   @id @default(cuid())
-  userId    String   @map("user_id") @unique
+  userId    String   @unique @map("user_id")
   email     Json     @default("{}")
   inApp     Json     @default("{}") @map("in_app")
   push      Json     @default("{}")

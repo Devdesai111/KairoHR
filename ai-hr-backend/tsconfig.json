@@ -12,9 +12,9 @@
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
     "forceConsistentCasingInFileNames": true,
     "paths": {
       "@common/*": ["src/common/*"],

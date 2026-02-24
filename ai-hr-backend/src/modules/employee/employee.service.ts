@@ -46,7 +46,26 @@ export class EmployeeService {
     if (exists) throw new ConflictException('Employee with this email already exists');
     const employeeId = await this.genEmployeeId(orgId);
     return this.prisma.employee.create({
-      data: { orgId, employeeId, firstName: dto.firstName, lastName: dto.lastName, email: dto.email, phone: dto.phone, dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined, gender: dto.gender, designation: dto.designation, departmentId: dto.departmentId, locationId: dto.locationId, reportingManagerId: dto.reportingManagerId, dateOfJoining: new Date(dto.dateOfJoining), employmentType: dto.employmentType ?? 'FULL_TIME', personalDetails: dto.personalDetails ?? {}, emergencyContacts: dto.emergencyContacts ?? [], status: 'ACTIVE' },
+      data: {
+        orgId,
+        employeeId,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+        email: dto.email,
+        phone: dto.phone,
+        dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined,
+        gender: dto.gender,
+        designation: dto.designation,
+        departmentId: dto.departmentId,
+        locationId: dto.locationId,
+        reportingManagerId: dto.reportingManagerId,
+        dateOfJoining: new Date(dto.dateOfJoining),
+        employmentType: dto.employmentType ?? 'FULL_TIME',
+        // Prisma JSON fields – cast to any to satisfy types
+        personalDetails: (dto.personalDetails ?? {}) as any,
+        emergencyContacts: (dto.emergencyContacts ?? []) as any,
+        status: 'ACTIVE',
+      },
       include: { department: { select: { id: true, name: true } }, location: { select: { id: true, name: true } } },
     });
   }
@@ -66,7 +85,7 @@ export class EmployeeService {
     if (dto.dateOfExit) data.dateOfExit = new Date(dto.dateOfExit);
     if (dto.gender) data.gender = dto.gender;
     if (dto.employmentType) data.employmentType = dto.employmentType;
-    if (dto.personalDetails) data.personalDetails = dto.personalDetails;
+    if (dto.personalDetails) data.personalDetails = dto.personalDetails as any;
     return this.prisma.employee.update({ where: { id }, data });
   }
 

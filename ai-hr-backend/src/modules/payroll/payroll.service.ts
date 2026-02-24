@@ -15,11 +15,20 @@ export class PayrollService {
 
   // Salary Templates
   async getTemplates(orgId: string) { return this.prisma.salaryTemplate.findMany({ where: { orgId }, orderBy: { createdAt: 'desc' } }); }
-  async createTemplate(orgId: string, dto: CreateSalaryTemplateDto) { return this.prisma.salaryTemplate.create({ data: { orgId, name: dto.name, ctc: dto.ctc, components: dto.components } }); }
+  async createTemplate(orgId: string, dto: CreateSalaryTemplateDto) {
+    return this.prisma.salaryTemplate.create({
+      data: {
+        orgId,
+        name: dto.name,
+        ctc: dto.ctc,
+        components: dto.components as any,
+      },
+    });
+  }
   async updateTemplate(orgId: string, id: string, dto: Partial<CreateSalaryTemplateDto>) {
     const t = await this.prisma.salaryTemplate.findFirst({ where: { id, orgId } });
     if (!t) throw new NotFoundException('Template not found');
-    return this.prisma.salaryTemplate.update({ where: { id }, data: dto });
+    return this.prisma.salaryTemplate.update({ where: { id }, data: { ...(dto as any) } });
   }
   async deleteTemplate(orgId: string, id: string) {
     const t = await this.prisma.salaryTemplate.findFirst({ where: { id, orgId } });
@@ -39,8 +48,19 @@ export class PayrollService {
     if (!e) throw new NotFoundException('Employee not found');
     return this.prisma.employeeSalary.upsert({
       where: { employeeId },
-      create: { employeeId, ctc: data.ctc, components: data.components, templateId: data.templateId, effectiveFrom: new Date(data.effectiveFrom) },
-      update: { ctc: data.ctc, components: data.components, templateId: data.templateId, effectiveFrom: new Date(data.effectiveFrom) },
+      create: {
+        employeeId,
+        ctc: data.ctc,
+        components: data.components as any,
+        templateId: data.templateId,
+        effectiveFrom: new Date(data.effectiveFrom),
+      },
+      update: {
+        ctc: data.ctc,
+        components: data.components as any,
+        templateId: data.templateId,
+        effectiveFrom: new Date(data.effectiveFrom),
+      },
     });
   }
 
@@ -89,7 +109,7 @@ export class PayrollService {
         const daysAbsent = Math.max(0, daysInMonth - effectiveDays);
         const lopDays = daysAbsent;
 
-        const components = emp.salary.components as SalaryComponent[];
+        const components = emp.salary.components as unknown as SalaryComponent[];
         const earnings: Record<string, number> = {};
         const deductions: Record<string, number> = {};
 

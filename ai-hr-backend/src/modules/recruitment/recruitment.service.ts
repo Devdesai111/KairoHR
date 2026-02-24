@@ -88,7 +88,15 @@ export class RecruitmentService {
 
   // Offers
   async createOffer(appId: string, data: { designation: string; ctc: number; joiningDate?: string; terms?: Record<string, unknown> }) {
-    return this.prisma.offer.create({ data: { applicationId: appId, designation: data.designation, ctc: data.ctc, joiningDate: data.joiningDate ? new Date(data.joiningDate) : undefined, terms: data.terms } });
+    return this.prisma.offer.create({
+      data: {
+        applicationId: appId,
+        designation: data.designation,
+        ctc: data.ctc,
+        joiningDate: data.joiningDate ? new Date(data.joiningDate) : undefined,
+        terms: (data.terms ?? {}) as any,
+      },
+    });
   }
   async sendOffer(orgId: string, offerId: string) {
     const o = await this.prisma.offer.findUnique({ where: { id: offerId } });
