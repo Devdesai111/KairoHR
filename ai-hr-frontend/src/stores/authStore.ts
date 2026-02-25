@@ -29,15 +29,17 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       login: async (email: string, password: string) => {
         const { default: api } = await import('@/lib/api');
         const res = await api.post('/auth/login', { email, password });
-        const { user, tokens } = res.data.data;
-        set({ user, accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, isAuthenticated: true });
+        const data = res.data?.data ?? res.data;
+        const { user, accessToken, refreshToken } = data;
+        set({ user, accessToken, refreshToken, isAuthenticated: true });
       },
 
       register: async ({ orgName, name, email, password }) => {
         const { default: api } = await import('@/lib/api');
         const res = await api.post('/auth/register', { organizationName: orgName, name, email, password });
-        const { user, tokens } = res.data.data;
-        set({ user, accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, isAuthenticated: true });
+        const data = res.data?.data ?? res.data;
+        const { user, accessToken, refreshToken } = data;
+        set({ user, accessToken, refreshToken, isAuthenticated: true });
       },
 
       logout: () => {
@@ -59,8 +61,9 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         try {
           const { default: api } = await import('@/lib/api');
           const res = await api.post('/auth/refresh', { refreshToken });
-          const { tokens } = res.data.data;
-          set({ accessToken: tokens.accessToken, refreshToken: tokens.refreshToken });
+          const refreshData = res.data?.data ?? res.data;
+          const { accessToken, refreshToken } = refreshData;
+          set({ accessToken, refreshToken });
           return true;
         } catch {
           return false;

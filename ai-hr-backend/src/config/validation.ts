@@ -19,11 +19,11 @@ export const validationSchema = Joi.object({
   MINIO_SECRET_KEY: Joi.string().default('minioadmin'),
   MINIO_BUCKET_NAME: Joi.string().default('ai-hr-files'),
   ANTHROPIC_API_KEY: Joi.string().allow('').optional(),
-  SMTP_HOST: Joi.string().default('smtp.gmail.com'),
+  SMTP_HOST: Joi.string().allow('').optional().default('smtp.gmail.com'),
   SMTP_PORT: Joi.number().default(587),
   SMTP_USER: Joi.string().allow('').optional(),
   SMTP_PASS: Joi.string().allow('').optional(),
-  SMTP_FROM: Joi.string().default('noreply@aihr.com'),
+  SMTP_FROM: Joi.string().allow('').optional().default('noreply@aihr.com'),
   FRONTEND_URL: Joi.string().default('http://localhost:5173'),
   ENCRYPTION_KEY: Joi.string().min(32).required(),
 });

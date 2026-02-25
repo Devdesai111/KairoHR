@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "KairoHR Backend",
-      "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--dir", "/Users/gadgetzone/Downloads/AiHR/ai-hr-backend", "start:dev"],
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "/Users/gadgetzone/Downloads/AiHR/ai-hr-backend", "run", "start:dev"],
       "port": 3000
     },
     {

@@ -6,7 +6,6 @@ import * as compression from 'compression';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { TimeoutInterceptor } from './common/interceptors/timeout.interceptor';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
@@ -23,7 +22,15 @@ async function bootstrap(): Promise<void> {
   // CORS
   const frontendUrl = configService.get<string>('frontendUrl') ?? 'http://localhost:5173';
   app.enableCors({
-    origin: [frontendUrl, 'http://localhost:3001'],
+    origin: (origin, callback) => {
+      // Allow configured frontend URL and localhost origins during development
+      const allowed = [frontendUrl, 'http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'];
+      if (!origin || allowed.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(null, false);
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-Id'],
@@ -43,9 +50,11 @@ async function bootstrap(): Promise<void> {
     }),
   );
   app.useGlobalFilters(new HttpExceptionFilter());
+  // Note: TransformInterceptor is registered via APP_INTERCEPTOR in app.module.ts
+  // to enable dependency injection. LoggingInterceptor and TimeoutInterceptor
+  // are registered here since they don't need DI.
   app.useGlobalInterceptors(
     new LoggingInterceptor(),
-    new TransformInterceptor(),
     new TimeoutInterceptor(),
   );
   app.useGlobalGuards(new JwtAuthGuard(reflector));
